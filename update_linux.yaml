@@ -6,6 +6,8 @@
     - name: Update repository cache (apt-get update)
       apt:
         update_cache: yes
+        ignore_unable_to_update_cache: yes
+      become: true
 
     - name: Upgrade semua paket ke versi terbaru
       apt:
