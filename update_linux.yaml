@@ -1,0 +1,12 @@
+---
+- name: Update dan Patch Linux
+  hosts: all
+  become: true
+  tasks:
+    - name: Update repository cache (apt-get update)
+      apt:
+        update_cache: yes
+
+    - name: Upgrade semua paket ke versi terbaru
+      apt:
+        upgrade: dist
