@@ -1,31 +1,31 @@
 ---
-- name: Update dan Patch Linux
+- name: Install Virtualbox dan Firefox
   hosts: all
   gather_facts: yes
   become: yes
   
   tasks:
-    - name: Wait for system to be ready
-      wait_for_connection:
-        timeout: 60
-    
     - name: Update repository cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
     
-    - name: Upgrade semua paket (skip yang conflict/downgrade)
+    - name: Install Firefox
       apt:
-        upgrade: safe
-        autoremove: yes
+        name: firefox
+        state: latest
         force_apt_get: yes
       environment:
         DEBIAN_FRONTEND: noninteractive
-      async: 3600
-      poll: 10
-      register: apt_upgrade
     
-    - name: Tampilkan hasil upgrade
+    - name: Install Virtualbox 7.1
+      apt:
+        name: virtualbox-7.1
+        state: latest
+        force_apt_get: yes
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+    
+    - name: Tampilkan status instalasi
       debug:
-        msg: "Upgrade completed successfully"
-      when: apt_upgrade.changed
+        msg: "Instalasi selesai - Firefox dan Virtualbox 7.1"
