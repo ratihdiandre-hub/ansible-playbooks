@@ -1,0 +1,24 @@
+---
+- name: Health Check PC
+  hosts: all
+  become: yes
+  tasks:
+    - name: Cek disk space
+      shell: df -h / | tail -1
+      register: disk
+    
+    - name: Cek memory usage
+      shell: free -h | grep Mem
+      register: memory
+    
+    - name: Cek uptime
+      shell: uptime
+      register: uptime
+    
+    - name: Show info
+      debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "Disk: {{ disk.stdout }}"
+          - "Memory: {{ memory.stdout }}"
+          - "Uptime: {{ uptime.stdout }}"
