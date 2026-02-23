@@ -14,9 +14,9 @@
         update_cache: yes
         cache_valid_time: 3600
     
-    - name: Upgrade semua paket ke versi terbaru
+    - name: Upgrade semua paket (skip yang conflict/downgrade)
       apt:
-        upgrade: dist
+        upgrade: safe
         autoremove: yes
         force_apt_get: yes
       environment:
@@ -25,7 +25,7 @@
       poll: 10
       register: apt_upgrade
     
-    - name: Tampilkan jumlah paket yang diupgrade
+    - name: Tampilkan hasil upgrade
       debug:
-        msg: "{{ apt_upgrade.changed }} packages upgraded"
+        msg: "Upgrade completed successfully"
       when: apt_upgrade.changed
