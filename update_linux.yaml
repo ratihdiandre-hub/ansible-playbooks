@@ -9,22 +9,23 @@
       wait_for_connection:
         timeout: 60
     
-    - name: Update repository cache (apt-get update)
+    - name: Update repository cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
-      register: apt_update
-      retries: 3
-      delay: 10
-      until: apt_update is success
     
     - name: Upgrade semua paket ke versi terbaru
       apt:
         upgrade: dist
         autoremove: yes
+        force_apt_get: yes
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+      async: 3600
+      poll: 10
       register: apt_upgrade
     
-    - name: Tampilkan hasil upgrade
+    - name: Tampilkan jumlah paket yang diupgrade
       debug:
-        msg: "Upgrade completed successfully"
+        msg: "{{ apt_upgrade.changed }} packages upgraded"
       when: apt_upgrade.changed
