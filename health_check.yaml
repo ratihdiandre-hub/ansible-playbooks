@@ -1,7 +1,6 @@
 ---
 - name: Health Check PC
   hosts: all
-  become: no
   gather_facts: true
 
   tasks:
