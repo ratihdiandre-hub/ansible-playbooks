@@ -1,6 +1,16 @@
 ---
+- name: Cek user aktual
+  ansible.builtin.command: id
+  register: current_identity
+  changed_when: false
+
+- name: Tampilkan user aktual
+  ansible.builtin.debug:
+    var: current_identity.stdout
+    
 - name: Health Check PC
   hosts: all
+  become: false
   gather_facts: true
 
   tasks:
