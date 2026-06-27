@@ -1,4 +1,3 @@
-```yaml
 ---
 - name: Health Check PC
   hosts: all
@@ -62,5 +61,5 @@
           - "Updates    : {{ upgrade_count.stdout | default('Tidak terdeteksi') }} package"
           - "Reboot     : {{ 'Required' if reboot_required.stat.exists else 'Not required' }}"
           - "========================================"
-```
+
 
