@@ -1,24 +1,66 @@
+```yaml
 ---
 - name: Health Check PC
   hosts: all
-  become: yes
+  become: false
+  gather_facts: true
+
   tasks:
-    - name: Cek disk space
-      shell: df -h / | tail -1
+    - name: Cek disk root
+      ansible.builtin.command:
+        cmd: df -h /
       register: disk
-    
+      changed_when: false
+
     - name: Cek memory usage
-      shell: free -h | grep Mem
+      ansible.builtin.command:
+        cmd: free -h
       register: memory
-    
+      changed_when: false
+
     - name: Cek uptime
-      shell: uptime
+      ansible.builtin.command:
+        cmd: uptime -p
       register: uptime
-    
-    - name: Show info
-      debug:
+      changed_when: false
+
+    - name: Cek system load
+      ansible.builtin.command:
+        cmd: uptime
+      register: system_load
+      changed_when: false
+
+    - name: Cek reboot required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+    - name: Cek jumlah package yang dapat di-upgrade
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          apt list --upgradable 2>/dev/null | tail -n +2 | wc -l
+        executable: /bin/bash
+      register: upgrade_count
+      changed_when: false
+      failed_when: false
+
+    - name: Tampilkan hasil health check
+      ansible.builtin.debug:
         msg:
-          - "Host: {{ inventory_hostname }}"
-          - "Disk: {{ disk.stdout }}"
-          - "Memory: {{ memory.stdout }}"
-          - "Uptime: {{ uptime.stdout }}"
+          - "========================================"
+          - "Host       : {{ inventory_hostname }}"
+          - "Hostname   : {{ ansible_hostname }}"
+          - "IP Address : {{ ansible_default_ipv4.address | default('Tidak terdeteksi') }}"
+          - "OS         : {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Kernel     : {{ ansible_kernel }}"
+          - "CPU        : {{ ansible_processor_vcpus | default('Tidak terdeteksi') }} vCPU"
+          - "Uptime     : {{ uptime.stdout }}"
+          - "Disk       : {{ disk.stdout_lines[-1] }}"
+          - "Memory     : {{ memory.stdout_lines[1] | default(memory.stdout) }}"
+          - "Load       : {{ system_load.stdout }}"
+          - "Updates    : {{ upgrade_count.stdout | default('Tidak terdeteksi') }} package"
+          - "Reboot     : {{ 'Required' if reboot_required.stat.exists else 'Not required' }}"
+          - "========================================"
+```
+
